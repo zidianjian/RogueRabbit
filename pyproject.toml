@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rogue-rabbit"
+version = "0.1.0"
+description = "Harness-oriented Python agent foundation"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "RogueRabbit" }
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
