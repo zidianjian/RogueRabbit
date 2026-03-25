@@ -11,15 +11,22 @@ experiments 包 - 学习实验
 
 实验列表:
 ========
+LLM 基础 (v0.1):
 - 01_hello_llm: 最简单的 LLM 调用
 - 02_conversation: 多轮对话管理
 - 03_system_prompt: 系统提示词的作用
+
+MCP 工具调用 (v0.2):
+- 04_mcp_basic: 基础 MCP 调用
+- 05_mcp_with_llm: LLM + MCP 组合（简单 ReAct Agent）
 
 运行方式:
 ========
     python -m rogue_rabbit.experiments.01_hello_llm
     python -m rogue_rabbit.experiments.02_conversation
     python -m rogue_rabbit.experiments.03_system_prompt
+    python -m rogue_rabbit.experiments.04_mcp_basic
+    python -m rogue_rabbit.experiments.05_mcp_with_llm
 """
 
 __all__ = []
