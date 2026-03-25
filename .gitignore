@@ -1,3 +1,14 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Environment variables (contains secrets - DO NOT COMMIT)
+.env
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# IDE
+.claude/

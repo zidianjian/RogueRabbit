@@ -11,6 +11,16 @@ requires-python = ">=3.11"
 authors = [
   { name = "RogueRabbit" }
 ]
+dependencies = [
+  "openai>=1.0.0",
+  "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "jupyter>=1.0.0",
+  "pytest>=7.0.0",
+]
 
 [tool.setuptools]
 package-dir = { "" = "src" }
