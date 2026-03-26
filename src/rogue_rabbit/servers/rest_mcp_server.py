@@ -179,11 +179,22 @@ if __name__ == "__main__":
     import sys
 
     # 启动日志输出到 stderr（不干扰 STDIO 协议）
+    print("\n" + "=" * 50, file=sys.stderr)
+    print("RogueRabbit MCP Server", file=sys.stderr)
     print("=" * 50, file=sys.stderr)
-    print("RogueRabbit MCP Server 启动中...", file=sys.stderr)
     print(f"REST API 地址: {REST_API_BASE_URL}", file=sys.stderr)
-    print(f"可用工具: list_items, get_item, create_item, update_item, delete_item", file=sys.stderr)
-    print("=" * 50, file=sys.stderr)
+    print(f"可用工具:", file=sys.stderr)
+    print(f"  - list_items: 获取所有物品列表", file=sys.stderr)
+    print(f"  - get_item: 获取单个物品详情", file=sys.stderr)
+    print(f"  - create_item: 创建新物品", file=sys.stderr)
+    print(f"  - update_item: 更新物品信息", file=sys.stderr)
+    print(f"  - delete_item: 删除物品", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("运行方式:", file=sys.stderr)
+    print("  python -m rogue_rabbit.servers.rest_mcp_server", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("注意: 此服务使用 STDIO 协议，需要由 MCP 客户端调用", file=sys.stderr)
+    print("=" * 50 + "\n", file=sys.stderr)
 
     # 以 STDIO 模式运行 MCP Server
     mcp.run()
