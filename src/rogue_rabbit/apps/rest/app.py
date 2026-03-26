@@ -167,3 +167,21 @@ async def delete_item(item_id: int):
         raise HTTPException(status_code=404, detail="Item not found")
     del _items_db[item_id]
     return {"message": f"Item {item_id} deleted"}
+
+
+# ========================================
+# 入口
+# ========================================
+
+if __name__ == "__main__":
+    import uvicorn
+
+    print("\n" + "=" * 50)
+    print("RogueRabbit REST API")
+    print("=" * 50)
+    print("启动方式:")
+    print("  直接运行: python -m rogue_rabbit.apps.rest.app")
+    print("  或使用:   uvicorn rogue_rabbit.apps.rest.app:app --reload")
+    print("=" * 50 + "\n")
+
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
