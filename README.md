@@ -23,7 +23,8 @@ RogueRabbit 是一个用 Python 构建的 agent 学习与工程化项目。
 | 0.1 | LLM 交互最小闭环 | ✅ 完成 |
 | 0.2 | MCP 调用最小闭环 | ✅ 完成 |
 | 0.2.1 | REST + MCP Server + LLM 集成 | ✅ 完成 |
-| 0.3 | Skill 调用最小闭环 | 📋 计划中 |
+| 0.3 | Skill 调用最小闭环 | ✅ 完成 |
+| 0.4 | Session 管理 | 📋 计划中 |
 
 ## 快速开始
 
@@ -35,6 +36,7 @@ pip install -e .
 python -m rogue_rabbit.experiments.01_hello_llm
 python -m rogue_rabbit.experiments.06_mcp_real
 python -m rogue_rabbit.experiments.07_rest_mcp_llm
+python -m rogue_rabbit.experiments.08_skill_basic
 ```
 
 ## 实验列表
@@ -52,6 +54,10 @@ python -m rogue_rabbit.experiments.07_rest_mcp_llm
 ### REST + MCP + LLM (v0.2.1)
 - `07_rest_mcp_llm`: REST API + MCP Server + LLM 完整演示
 
+### Skill 调用 (v0.3)
+- `08_skill_basic`: Skill 基础调用
+- `09_skill_with_llm`: LLM + Skill 集成
+
 ## 架构
 
 ```
@@ -60,7 +66,31 @@ src/rogue_rabbit/
 ├── apps/           # 应用入口（CLI, REST）
 │   └── rest/       # FastAPI REST 应用
 ├── contracts/      # 核心接口定义
-├── core/           # 核心功能（ReAct Agent）
+├── core/           # 核心功能（ReAct Agent, Skill Manager）
 ├── servers/        # MCP Server 实现
+├── skills/         # 内置 Skills
+│   ├── calculator/ # 数学计算
+│   ├── file_reader/# 文件读取
+│   └── code_review/# 代码审查
 └── experiments/    # 学习实验
+```
+
+## Skill vs MCP
+
+| 特性 | MCP | Skill |
+|------|-----|-------|
+| 类型 | 工具/函数 | 提示词扩展 |
+| 输入 | 结构化参数 | 自然语言 |
+| 输出 | 结构化结果 | 指导性内容 |
+| 调用方式 | Tool Call | 上下文注入 |
+| 适合场景 | 明确的输入输出操作 | 需要灵活处理的任务 |
+
+## 启动脚本
+
+```bash
+# 启动 REST API 服务
+start_rest.bat
+
+# 启动 MCP Server（需要 REST API 先运行）
+start_mcp_server.bat
 ```
