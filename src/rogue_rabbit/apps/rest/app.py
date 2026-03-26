@@ -4,10 +4,28 @@ FastAPI REST 应用 - 物品管理 API
 提供简单的 CRUD 操作，用于演示 LLM 通过 MCP 调用 REST API。
 """
 
+import logging
+import sys
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
+
+# 创建 logger 引用
+logger = logging.getLogger("rest-api")
+
+# ========================================
+# 日志配置
+# ========================================
+
+# 配置日志输出到 stderr（避免干扰 STDIO 通信）
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(levelname)s: %(message)s",
+    datefmt="%H:%M:%S",
+    stream=sys.stderr,
+)
+logger = logging.getLogger("rest-api")
 
 # ========================================
 # 数据模型
@@ -49,6 +67,7 @@ def _init_sample_data():
     _items_db[2] = {"id": 2, "name": "Banana", "price": 2.0, "quantity": 50}
     _items_db[3] = {"id": 3, "name": "Orange", "price": 3.0, "quantity": 75}
     _item_id_counter = 4
+    logger.info(f"初始化示例数据完成，共 {len(_items_db)} 个物品")
 
 
 # ========================================
@@ -60,12 +79,14 @@ def _init_sample_data():
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # 启动时初始化数据
+    logger.info("=" * 50)
+    logger.info("RogueRabbit REST API 启动中...")
+    logger.info("=" * 50)
     _init_sample_data()
-    print("[REST API] 服务启动，初始化示例数据完成")
     yield
     # 关闭时清理
     _items_db.clear()
-    print("[REST API] 服务关闭")
+    logger.info("REST API 服务已关闭")
 
 
 # ========================================
@@ -78,6 +99,20 @@ app = FastAPI(
     version="0.2.1",
     lifespan=lifespan,
 )
+
+
+# ========================================
+# 请求日志中间件
+# ========================================
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """记录所有 HTTP 请求"""
+    logger.info(f">>> {request.method} {request.url.path}")
+    response = await call_next(request)
+    logger.info(f"<<< {request.method} {request.url.path} -> {response.status_code}")
+    return response
 
 
 # ========================================

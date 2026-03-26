@@ -176,5 +176,14 @@ async def delete_item(item_id: int) -> str:
 # ========================================
 
 if __name__ == "__main__":
+    import sys
+
+    # 启动日志输出到 stderr（不干扰 STDIO 协议）
+    print("=" * 50, file=sys.stderr)
+    print("RogueRabbit MCP Server 启动中...", file=sys.stderr)
+    print(f"REST API 地址: {REST_API_BASE_URL}", file=sys.stderr)
+    print(f"可用工具: list_items, get_item, create_item, update_item, delete_item", file=sys.stderr)
+    print("=" * 50, file=sys.stderr)
+
     # 以 STDIO 模式运行 MCP Server
     mcp.run()

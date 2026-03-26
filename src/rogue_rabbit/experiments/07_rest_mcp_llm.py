@@ -64,19 +64,25 @@ class RestServiceRunner:
 
         import uvicorn
 
+        print(f"\n{'='*50}")
+        print(f"[REST] 启动 REST API 服务...")
+        print(f"[REST] 地址: http://{self.host}:{self.port}")
+        print(f"[REST] 文档: http://{self.host}:{self.port}/docs")
+        print(f"{'='*50}\n")
+
         def run_server():
             from rogue_rabbit.apps.rest.app import app
 
-            uvicorn.run(app, host=self.host, port=self.port, log_level="warning")
+            # 使用 info 级别显示更多日志
+            uvicorn.run(app, host=self.host, port=self.port, log_level="info")
 
         self._thread = threading.Thread(target=run_server, daemon=True)
         self._thread.start()
-        time.sleep(1.5)  # 等待服务启动
-        print(f"[OK] REST 服务已启动: http://{self.host}:{self.port}")
+        time.sleep(2)  # 等待服务启动
 
     def stop(self):
         """停止服务（daemon 线程会自动停止）"""
-        print("[OK] REST 服务已停止")
+        print(f"\n[REST] 服务已停止")
 
 
 # ========================================
