@@ -8,7 +8,7 @@
 3. 体验完整的 LLM + Skill 交互
 
 架构:
-    用户 -> LLM -> 选择 Skill -> 注入内容 -> LLM 执行 -> 返回结果
+    用户 -> SkillAgent -> 选择 Skill -> 注入内容 -> LLM 执行 -> 返回结果
 
 运行方式:
     python -m rogue_rabbit.experiments.09_skill_with_llm
@@ -21,7 +21,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from rogue_rabbit.contracts import Message, Role, Skill, SkillMeta
+from rogue_rabbit.contracts import Message, Role, Skill
 from rogue_rabbit.core.skill_manager import SkillManager
 from rogue_rabbit.skills import get_skill_dirs
 
@@ -48,93 +48,176 @@ def check_api_key() -> bool:
 
 
 # ========================================
-# Skill 选择器
+# Skill Agent
 # ========================================
 
 
-class SkillSelector:
+class SkillAgent:
     """
-    Skill 选择器
+    Skill Agent - 集成 Skill 的智能代理
 
-    让 LLM 选择合适的 Skill 并注入上下文
+    职责:
+    1. 根据问题关键词自动匹配 Skill
+    2. 将 Skill 内容注入 LLM 上下文
+    3. 执行并返回结果
     """
 
-    def __init__(self, manager: SkillManager, llm_client):
+    def __init__(self, manager: SkillManager, llm_client, verbose: bool = True):
         self._manager = manager
         self._llm = llm_client
+        self._verbose = verbose
 
-    def _build_skill_selection_prompt(self) -> str:
-        """构建 Skill 选择提示"""
-        skill_list = self._manager.get_skill_descriptions()
-        return f"""你是一个智能助手，可以使用 Skills 来帮助完成任务。
+    def _log(self, message: str):
+        """打印日志"""
+        if self._verbose:
+            print(message)
 
-{skill_list}
-
-使用规则:
-1. 当需要使用 Skill 时，按以下格式回复：
-   SKILL: skill名称
-
-2. 如果不需要任何 Skill，直接回答问题。
-
-请始终用中文回复。"""
-
-    def select_skill(self, question: str) -> str | None:
+    def _match_skill_by_keywords(self, question: str) -> str | None:
         """
-        让 LLM 选择合适的 Skill
+        根据关键词匹配 Skill
 
-        Args:
-            question: 用户问题
-
-        Returns:
-            Skill 名称或 None
+        简单的关键词匹配，实际应用中可以用 LLM 或向量相似度
+        使用列表保持优先级顺序
         """
-        system_prompt = self._build_skill_selection_prompt()
+        question_lower = question.lower()
+
+        # 关键词映射（按优先级排序：先检查更具体的）
+        keyword_map = [
+            ("code-review", ["审查", "代码审查", "code review", "检查代码", "代码质量", "代码"]),
+            ("file-reader", ["读取", "文件", "file", "read", "读取文件", "打开文件", "readme"]),
+            ("calculator", ["计算", "数学", "加减乘除", "乘方", "次方", "求和", "多少"]),
+        ]
+
+        for skill_name, keywords in keyword_map:
+            for kw in keywords:
+                if kw in question_lower:
+                    if self._manager.has_skill(skill_name):
+                        return skill_name
+                    break
+
+        return None
+
+    def _select_skill_via_llm(self, question: str) -> str | None:
+        """
+        让 LLM 选择 Skill（可选的高级方法）
+
+        返回: skill 名称或 None
+        """
+        skill_descriptions = self._manager.get_skill_descriptions()
+
+        system_prompt = f"""你是一个 Skill 选择器。根据用户问题，选择最合适的 Skill。
+
+{skill_descriptions}
+
+规则:
+1. 如果需要使用 Skill，只回复 Skill 名称（如: calculator）
+2. 如果不需要任何 Skill，回复: none
+
+只回复 Skill 名称或 none，不要有其他内容。"""
 
         messages = [
             Message(role=Role.SYSTEM, content=system_prompt),
             Message(role=Role.USER, content=question),
         ]
 
-        response = self._llm.complete(messages)
-        print(f"\n[LLM 回复]\n{response}")
+        response = self._llm.complete(messages).strip().lower()
+        self._log(f"[LLM 选择] 原始回复: {response}")
 
-        # 解析 Skill 选择
-        match = re.search(r"SKILL:\s*(\S+)", response)
-        if match:
-            skill_name = match.group(1).strip()
-            if self._manager.has_skill(skill_name):
-                return skill_name
-            print(f"[警告] 未找到 Skill: {skill_name}")
+        # 清理响应，提取 skill 名称
+        response = response.replace("skill:", "").strip()
+
+        if response == "none" or not response:
+            return None
+
+        # 检查是否是有效的 skill
+        if self._manager.has_skill(response):
+            return response
 
         return None
 
-    def execute_with_skill(self, question: str, skill: Skill) -> str:
+    def _execute_with_skill(self, question: str, skill: Skill) -> str:
         """
         使用 Skill 执行任务
 
-        Args:
-            question: 用户问题
-            skill: 选中的 Skill
-
-        Returns:
-            最终答案
+        将 Skill 内容注入 System Prompt
         """
-        # 构建包含 Skill 内容的 prompt
-        skill_prompt = f"""你正在使用 "{skill.meta.name}" Skill 来完成任务。
+        skill_prompt = f"""你正在使用 "{skill.meta.name}" Skill。
+
+Skill 说明: {skill.meta.description}
 
 {skill.get_full_prompt()}
 
 ---
 
-请根据以上 Skill 指导，完成用户的任务。"""
+请根据以上 Skill 指导完成用户的任务。严格按照 Skill 中的说明操作。"""
 
         messages = [
             Message(role=Role.SYSTEM, content=skill_prompt),
             Message(role=Role.USER, content=question),
         ]
 
-        response = self._llm.complete(messages)
-        return response
+        return self._llm.complete(messages)
+
+    def _execute_without_skill(self, question: str) -> str:
+        """
+        不使用 Skill 直接执行
+        """
+        messages = [
+            Message(role=Role.USER, content=question),
+        ]
+        return self._llm.complete(messages)
+
+    def run(
+        self,
+        question: str,
+        use_llm_selection: bool = False,
+    ) -> str:
+        """
+        运行 Agent
+
+        Args:
+            question: 用户问题
+            use_llm_selection: 是否使用 LLM 选择 Skill（默认用关键词匹配）
+
+        Returns:
+            最终答案
+        """
+        self._log(f"\n{'='*50}")
+        self._log(f"问题: {question}")
+        self._log("=" * 50)
+
+        # Step 1: 选择 Skill
+        self._log("\n[步骤 1] 选择 Skill...")
+
+        if use_llm_selection:
+            skill_name = self._select_skill_via_llm(question)
+        else:
+            skill_name = self._match_skill_by_keywords(question)
+
+        # Step 2: 执行
+        if skill_name:
+            self._log(f"[选择结果] 使用 Skill: {skill_name}")
+
+            # 加载 Skill
+            skill = self._manager.load(skill_name)
+            if not skill:
+                self._log(f"[错误] 无法加载 Skill: {skill_name}")
+                return self._execute_without_skill(question)
+
+            # 显示 Skill 内容
+            self._log(f"\n[Skill 内容预览]")
+            lines = skill.content.split("\n")[:8]
+            self._log("  " + "\n  ".join(lines))
+
+            # 使用 Skill 执行
+            self._log(f"\n[步骤 2] 使用 Skill 执行...")
+            answer = self._execute_with_skill(question, skill)
+        else:
+            self._log("[选择结果] 不需要 Skill，直接回答")
+            self._log(f"\n[步骤 2] 直接执行...")
+            answer = self._execute_without_skill(question)
+
+        return answer
 
 
 # ========================================
@@ -165,63 +248,43 @@ async def run_demo():
 
     llm_client = GLMClient()
 
-    # 创建 Skill 选择器
-    selector = SkillSelector(manager, llm_client)
+    # 创建 Skill Agent
+    agent = SkillAgent(manager, llm_client, verbose=True)
 
     # 测试用例
     test_questions = [
         "帮我计算 2 的 20 次方是多少",
-        # "读取 README.md 文件并总结内容",
-        # "审查这段代码: def add(a, b): return a + b",
+        "读取 README.md 文件并告诉我里面有什么",
+        "审查这段代码: def add(a, b): return a + b",
+        "今天天气怎么样？",  # 不需要 Skill
     ]
 
     for question in test_questions:
-        print("\n" + "=" * 60)
-        print(f"问题: {question}")
-        print("=" * 60)
-
-        # Step 1: LLM 选择 Skill
-        print("\n[步骤 1] LLM 选择 Skill...")
-        skill_name = selector.select_skill(question)
-
-        if skill_name:
-            print(f"\n[选择结果] Skill: {skill_name}")
-
-            # Step 2: 加载 Skill
-            print("\n[步骤 2] 加载 Skill 内容...")
-            skill = manager.load(skill_name)
-            if skill:
-                print(f"[Skill 内容预览]")
-                lines = skill.content.split("\n")[:10]
-                print("  " + "\n  ".join(lines))
-
-                # Step 3: 使用 Skill 执行
-                print("\n[步骤 3] 使用 Skill 执行任务...")
-                answer = selector.execute_with_skill(question, skill)
-                print(f"\n[最终答案]\n{answer}")
-        else:
-            print("\n[结果] 不需要 Skill，直接回答")
-            messages = [Message(role=Role.USER, content=question)]
-            answer = llm_client.complete(messages)
-            print(f"\n[答案]\n{answer}")
+        answer = agent.run(question)
+        print(f"\n{'='*50}")
+        print(f"[最终答案]\n{answer}")
 
     # 总结
     print("\n" + "=" * 60)
     print("学习总结")
     print("=" * 60)
     print("""
-1. Skill 选择: LLM 根据问题描述选择合适的 Skill
-2. Skill 加载: SkillManager 加载 Skill 的完整内容
-3. Skill 注入: Skill 内容作为 System Prompt 注入
-4. 任务执行: LLM 根据 Skill 指导完成任务
+Skill Agent 工作流程:
+1. 问题分析 -> 关键词匹配或 LLM 选择
+2. Skill 加载 -> 获取完整内容
+3. 上下文注入 -> Skill 内容作为 System Prompt
+4. LLM 执行 -> 根据 Skill 指导完成任务
 
-关键流程:
-  用户问题 -> LLM 选择 Skill -> 加载 Skill -> 注入上下文 -> 执行任务
+关键设计:
+- SkillAgent: 统一的 Agent 接口
+- 关键词匹配: 简单高效的 Skill 选择
+- LLM 选择: 更智能但更慢的备选方案
+- 职责分离: 选择、加载、执行各自独立
 
 与 MCP 的配合:
-  - Skill: 指导 LLM "如何" 做某事
-  - MCP: 提供 "工具" 让 LLM 执行具体操作
-  - 可以组合使用: Skill 指导 + MCP 工具执行
+- Skill: 指导 LLM "如何" 做某事
+- MCP: 提供 "工具" 让 LLM 执行具体操作
+- 可以组合: Skill 指导 + MCP 工具执行
 """)
 
 
