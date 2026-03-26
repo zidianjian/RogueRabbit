@@ -134,9 +134,10 @@ class ReActAgent:
             self._log(f"\n[LLM 回复]\n{response}")
 
             # 检查是否需要调用工具
-            if "ACTION:" in response and "ANSWER:" not in response:
-                # 解析工具调用
-                action, arguments = self._parse_action(response)
+            action, arguments = self._parse_action(response)
+
+            if action and "ANSWER:" not in response:
+                # 有工具调用
                 self._log(f"\n[调用工具] {action}({arguments})")
 
                 # 执行工具
@@ -190,19 +191,48 @@ class ReActAgent:
         return "\n".join(lines)
 
     def _parse_action(self, response: str) -> tuple[str, dict]:
-        """解析工具调用"""
-        # 提取 ACTION
-        action_match = re.search(r"ACTION:\s*(\w+)", response)
-        action = action_match.group(1) if action_match else ""
-
-        # 提取 ARGUMENTS
-        args_match = re.search(r"ARGUMENTS:\s*(\{.*?\})", response, re.DOTALL)
+        """解析工具调用 - 支持多种格式"""
+        action = ""
         arguments = {}
-        if args_match:
+
+        # 格式 1: 标准 ReAct 格式 (ACTION: xxx ARGUMENTS: {...})
+        action_match = re.search(r"ACTION:\s*(\w+)", response)
+        if action_match:
+            action = action_match.group(1)
+            args_match = re.search(r"ARGUMENTS:\s*(\{.*?\})", response, re.DOTALL)
+            if args_match:
+                try:
+                    arguments = json.loads(args_match.group(1))
+                except json.JSONDecodeError:
+                    self._log("[警告] 无法解析参数，使用空参数")
+            return action, arguments
+
+        # 格式 2: 直接返回工具名和参数 (tool_name {"arg": "value"})
+        # GLM 有时会直接输出这种格式
+        direct_match = re.search(r"^(\w+)\s*(\{.*?\})\s*$", response.strip(), re.DOTALL)
+        if direct_match:
+            action = direct_match.group(1)
             try:
-                arguments = json.loads(args_match.group(1))
+                arguments = json.loads(direct_match.group(2))
             except json.JSONDecodeError:
-                self._log("[警告] 无法解析参数，使用空参数")
+                pass
+            return action, arguments
+
+        # 格式 3: 只有工具名
+        simple_match = re.search(r"^(\w+)\s*$", response.strip())
+        if simple_match:
+            return simple_match.group(1), {}
+
+        # 格式 4: JSON 格式的函数调用
+        json_match = re.search(r'\{[^{}]*"name"\s*:\s*"(\w+)"[^{}]*\}', response)
+        if json_match:
+            try:
+                data = json.loads(json_match.group(0))
+                action = data.get("name", "")
+                arguments = data.get("arguments", {})
+                return action, arguments
+            except json.JSONDecodeError:
+                pass
 
         return action, arguments
 
@@ -302,20 +332,77 @@ async def demo_mock_mcp_real_llm():
 
 
 # ========================================
-# Demo 2: 连接真实 MCP 服务器
+# Demo 2: 真实 LLM + 真实 MCP（完整示例）
+# ========================================
+
+
+async def demo_real_llm_real_mcp():
+    """Demo 2: 真实 LLM + 真实 MCP 完整示例"""
+    print("\n" + "=" * 60)
+    print("Demo 2: 真实 LLM + 真实 MCP")
+    print("=" * 60)
+
+    if not check_api_key():
+        print("\n[跳过] 需要 API Key 才能运行此 Demo")
+        return
+
+    # filesystem MCP 服务器配置
+    config = MCPServerConfig(
+        name="filesystem",
+        transport=MCPTransportType.STDIO,
+        command="npx",
+        args=[
+            "-y",
+            "@modelcontextprotocol/server-filesystem",
+            str(Path.cwd()),  # 只允许访问当前工作目录
+        ],
+    )
+
+    print(f"\n连接 MCP 服务器: {config.name}")
+    print(f"启动命令: {config.command} {' '.join(config.args)}")
+
+    try:
+        print("\n[正在启动 MCP 服务器...]")
+        async with create_mcp_client(config) as mcp_client:
+            # 获取工具列表
+            tools = await mcp_client.list_tools()
+            print(f"[OK] 连接成功！发现 {len(tools)} 个工具:")
+            for tool in tools:
+                print(f"  - {tool.name}: {tool.description[:50]}...")
+
+            # 创建 LLM 客户端
+            llm_client = GLMClient()
+
+            # 创建 Agent
+            agent = ReActAgent(llm_client, mcp_client)
+
+            # 提问 - 需要使用文件系统工具来回答
+            question = f"请列出当前目录下的文件，并告诉我 {Path.cwd().name} 目录里有什么文件？"
+            print(f"\n问题: {question}")
+
+            answer = await agent.run(question)
+            print(f"\n{'='*50}")
+            print(f"最终答案: {answer}")
+
+    except Exception as e:
+        print(f"\n[FAIL] 连接失败: {e}")
+        print("\n可能的原因:")
+        print("  1. 没有安装 Node.js")
+        print("  2. npx 命令不可用")
+        print("  3. 网络问题无法下载 MCP 服务器")
+        print("\n请确保已安装 Node.js，然后重试。")
+
+
+# ========================================
+# Demo 3: 连接真实 MCP 服务器（仅展示）
 # ========================================
 
 
 async def demo_real_mcp_server():
-    """Demo 2: 连接真实 MCP 服务器"""
+    """Demo 3: 连接真实 MCP 服务器（仅展示配置）"""
     print("\n" + "=" * 60)
-    print("Demo 2: 连接真实 MCP 服务器")
+    print("Demo 3: MCP 服务器配置说明")
     print("=" * 60)
-
-    # 检查是否有 MCP 服务器可用
-    print("\n要连接真实的 MCP 服务器，你需要:")
-    print("1. 安装 MCP 服务器（如 filesystem、puppeteer 等）")
-    print("2. 配置服务器的启动命令")
 
     print("\n常见 MCP 服务器:")
     print("  - @modelcontextprotocol/server-filesystem: 文件系统操作")
@@ -325,58 +412,16 @@ async def demo_real_mcp_server():
     print("\n安装示例 (需要 Node.js):")
     print("  npm install -g @modelcontextprotocol/server-filesystem")
 
-    # 示例配置
-    print("\n" + "-" * 40)
-    print("示例配置:")
-    print("-" * 40)
-
-    # filesystem MCP 服务器配置示例
-    config = MCPServerConfig(
-        name="filesystem",
-        transport=MCPTransportType.STDIO,
-        command="npx",
-        args=[
-            "-y",
-            "@modelcontextprotocol/server-filesystem",
-            str(Path.home()),  # 允许访问用户目录
-        ],
-    )
-
-    print(f"服务器名称: {config.name}")
-    print(f"传输类型: {config.transport.value}")
-    print(f"启动命令: {config.command} {' '.join(config.args)}")
-
-    # 尝试连接（如果服务器可用）
-    print("\n" + "-" * 40)
-    print("尝试连接...")
-    print("-" * 40)
-
-    try:
-        async with create_mcp_client(config) as client:
-            tools = await client.list_tools()
-            print(f"\n[OK] 连接成功！发现 {len(tools)} 个工具:")
-            for tool in tools:
-                print(f"  - {tool.name}: {tool.description}")
-
-            # 如果有 LLM，可以进行交互
-            if check_api_key():
-                print("\n是否要使用这些工具回答问题？(y/n): ", end="")
-                # 在自动化脚本中跳过交互
-                print("跳过交互式输入")
-    except Exception as e:
-        print(f"\n[FAIL] 连接失败: {e}")
-        print("\n这是正常的，如果没有安装 MCP 服务器。")
-
 
 # ========================================
-# Demo 3: 自定义 MCP 服务器配置
+# Demo 4: 自定义 MCP 服务器配置
 # ========================================
 
 
 async def demo_custom_mcp_config():
-    """Demo 3: 自定义 MCP 服务器配置"""
+    """Demo 4: 自定义 MCP 服务器配置"""
     print("\n" + "=" * 60)
-    print("Demo 3: 自定义 MCP 服务器配置")
+    print("Demo 4: 自定义 MCP 服务器配置")
     print("=" * 60)
 
     print("\n你可以配置自己的 MCP 服务器。示例配置:")
@@ -442,10 +487,13 @@ async def main():
     # 运行 Demo 1（Mock MCP + 真实 LLM）
     await demo_mock_mcp_real_llm()
 
-    # 运行 Demo 2（尝试连接真实 MCP）
+    # 运行 Demo 2（真实 LLM + 真实 MCP 完整示例）
+    await demo_real_llm_real_mcp()
+
+    # 运行 Demo 3（配置说明）
     await demo_real_mcp_server()
 
-    # 运行 Demo 3（自定义配置说明）
+    # 运行 Demo 4（自定义配置说明）
     await demo_custom_mcp_config()
 
     # 总结
