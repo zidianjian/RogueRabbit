@@ -21,6 +21,9 @@ MCP 工具调用:
 - 05_mcp_with_llm: LLM + MCP 组合（简单 ReAct Agent）
 - 06_mcp_real: 真实 LLM + 真实 MCP
 
+REST + MCP + LLM:
+- 07_rest_mcp_llm: REST API + MCP Server + LLM 完整演示
+
 运行方式:
 ========
     python -m rogue_rabbit.experiments.01_hello_llm
@@ -29,6 +32,7 @@ MCP 工具调用:
     python -m rogue_rabbit.experiments.04_mcp_basic
     python -m rogue_rabbit.experiments.05_mcp_with_llm
     python -m rogue_rabbit.experiments.06_mcp_real
+    python -m rogue_rabbit.experiments.07_rest_mcp_llm
 """
 
 __all__ = []
