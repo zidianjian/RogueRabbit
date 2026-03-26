@@ -14,7 +14,18 @@ REST API MCP Server - 将 REST API 封装为 MCP 工具
 或作为 STDIO MCP 服务器被其他程序调用。
 """
 
+import logging
 import os
+import sys
+
+# 配置日志输出到 stderr（避免干扰 STDIO 通信）
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [MCP] %(message)s",
+    datefmt="%H:%M:%S",
+    stream=sys.stderr,
+)
+logger = logging.getLogger("mcp-server")
 
 # 配置 REST API 地址
 REST_API_BASE_URL = os.environ.get("REST_API_URL", "http://127.0.0.1:8000")
@@ -39,21 +50,26 @@ async def list_items() -> str:
     """
     import httpx
 
+    logger.info(">>> list_items() 被调用")
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(f"{REST_API_BASE_URL}/items/", timeout=5.0)
             if response.status_code == 200:
                 items = response.json()
+                logger.info(f"<<< list_items() -> 返回 {len(items)} 个物品")
                 if not items:
                     return "当前没有物品"
                 result = "物品列表:\n"
                 for item in items:
                     result += f"- ID: {item['id']}, 名称: {item['name']}, 价格: {item['price']}, 库存: {item['quantity']}\n"
                 return result
+            logger.warning(f"<<< list_items() -> HTTP {response.status_code}")
             return f"获取物品列表失败: HTTP {response.status_code}"
         except httpx.ConnectError:
+            logger.error(f"<<< list_items() -> 无法连接到 {REST_API_BASE_URL}")
             return f"无法连接到 REST API 服务 ({REST_API_BASE_URL})，请确保服务已启动"
         except Exception as e:
+            logger.error(f"<<< list_items() -> 错误: {str(e)}")
             return f"获取物品列表出错: {str(e)}"
 
 
@@ -67,6 +83,7 @@ async def get_item(item_id: int) -> str:
     """
     import httpx
 
+    logger.info(f">>> get_item(item_id={item_id}) 被调用")
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(
@@ -74,13 +91,18 @@ async def get_item(item_id: int) -> str:
             )
             if response.status_code == 200:
                 item = response.json()
+                logger.info(f"<<< get_item(item_id={item_id}) -> 找到 '{item['name']}'")
                 return f"物品详情: ID={item['id']}, 名称={item['name']}, 价格={item['price']}, 库存={item['quantity']}"
             elif response.status_code == 404:
+                logger.warning(f"<<< get_item(item_id={item_id}) -> 404 未找到")
                 return f"未找到 ID 为 {item_id} 的物品"
+            logger.warning(f"<<< get_item(item_id={item_id}) -> HTTP {response.status_code}")
             return f"获取物品失败: HTTP {response.status_code}"
         except httpx.ConnectError:
+            logger.error(f"<<< get_item(item_id={item_id}) -> 无法连接")
             return f"无法连接到 REST API 服务 ({REST_API_BASE_URL})"
         except Exception as e:
+            logger.error(f"<<< get_item(item_id={item_id}) -> 错误: {str(e)}")
             return f"获取物品出错: {str(e)}"
 
 
@@ -96,6 +118,7 @@ async def create_item(name: str, price: float, quantity: int = 0) -> str:
     """
     import httpx
 
+    logger.info(f">>> create_item(name='{name}', price={price}, quantity={quantity}) 被调用")
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
@@ -105,11 +128,15 @@ async def create_item(name: str, price: float, quantity: int = 0) -> str:
             )
             if response.status_code == 200:
                 item = response.json()
+                logger.info(f"<<< create_item(name='{name}') -> 成功创建 id={item['id']}")
                 return f"成功创建物品: ID={item['id']}, 名称={item['name']}, 价格={item['price']}, 库存={item['quantity']}"
+            logger.warning(f"<<< create_item(name='{name}') -> HTTP {response.status_code}")
             return f"创建物品失败: HTTP {response.status_code}"
         except httpx.ConnectError:
+            logger.error(f"<<< create_item(name='{name}') -> 无法连接")
             return f"无法连接到 REST API 服务 ({REST_API_BASE_URL})"
         except Exception as e:
+            logger.error(f"<<< create_item(name='{name}') -> 错误: {str(e)}")
             return f"创建物品出错: {str(e)}"
 
 
@@ -126,6 +153,7 @@ async def update_item(item_id: int, name: str, price: float, quantity: int) -> s
     """
     import httpx
 
+    logger.info(f">>> update_item(id={item_id}, name='{name}', price={price}, quantity={quantity}) 被调用")
     async with httpx.AsyncClient() as client:
         try:
             response = await client.put(
@@ -135,13 +163,18 @@ async def update_item(item_id: int, name: str, price: float, quantity: int) -> s
             )
             if response.status_code == 200:
                 item = response.json()
+                logger.info(f"<<< update_item(id={item_id}) -> 更新成功")
                 return f"成功更新物品: ID={item['id']}, 名称={item['name']}, 价格={item['price']}, 库存={item['quantity']}"
             elif response.status_code == 404:
+                logger.warning(f"<<< update_item(id={item_id}) -> 404 未找到")
                 return f"未找到 ID 为 {item_id} 的物品"
+            logger.warning(f"<<< update_item(id={item_id}) -> HTTP {response.status_code}")
             return f"更新物品失败: HTTP {response.status_code}"
         except httpx.ConnectError:
+            logger.error(f"<<< update_item(id={item_id}) -> 无法连接")
             return f"无法连接到 REST API 服务 ({REST_API_BASE_URL})"
         except Exception as e:
+            logger.error(f"<<< update_item(id={item_id}) -> 错误: {str(e)}")
             return f"更新物品出错: {str(e)}"
 
 
@@ -155,19 +188,25 @@ async def delete_item(item_id: int) -> str:
     """
     import httpx
 
+    logger.info(f">>> delete_item(id={item_id}) 被调用")
     async with httpx.AsyncClient() as client:
         try:
             response = await client.delete(
                 f"{REST_API_BASE_URL}/items/{item_id}", timeout=5.0
             )
             if response.status_code == 200:
+                logger.info(f"<<< delete_item(id={item_id}) -> 删除成功")
                 return f"成功删除 ID 为 {item_id} 的物品"
             elif response.status_code == 404:
+                logger.warning(f"<<< delete_item(id={item_id}) -> 404 未找到")
                 return f"未找到 ID 为 {item_id} 的物品"
+            logger.warning(f"<<< delete_item(id={item_id}) -> HTTP {response.status_code}")
             return f"删除物品失败: HTTP {response.status_code}"
         except httpx.ConnectError:
+            logger.error(f"<<< delete_item(id={item_id}) -> 无法连接")
             return f"无法连接到 REST API 服务 ({REST_API_BASE_URL})"
         except Exception as e:
+            logger.error(f"<<< delete_item(id={item_id}) -> 错误: {str(e)}")
             return f"删除物品出错: {str(e)}"
 
 

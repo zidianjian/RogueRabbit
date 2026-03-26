@@ -129,43 +129,58 @@ async def root():
 @app.get("/items/", response_model=list[Item])
 async def list_items():
     """获取所有物品列表"""
-    return list(_items_db.values())
+    items = list(_items_db.values())
+    logger.info(f"[API] list_items() -> 返回 {len(items)} 个物品")
+    return items
 
 
 @app.get("/items/{item_id}", response_model=Item)
 async def get_item(item_id: int):
     """获取单个物品详情"""
+    logger.info(f"[API] get_item(id={item_id})")
     if item_id not in _items_db:
+        logger.warning(f"[API] get_item(id={item_id}) -> 404 未找到")
         raise HTTPException(status_code=404, detail="Item not found")
-    return _items_db[item_id]
+    item = _items_db[item_id]
+    logger.info(f"[API] get_item(id={item_id}) -> {item['name']}")
+    return item
 
 
 @app.post("/items/", response_model=Item)
 async def create_item(item: ItemCreate):
     """创建新物品"""
     global _item_id_counter
+    logger.info(f"[API] create_item(name={item.name}, price={item.price}, quantity={item.quantity})")
     new_item = {"id": _item_id_counter, **item.model_dump()}
     _items_db[_item_id_counter] = new_item
     _item_id_counter += 1
+    logger.info(f"[API] create_item() -> 创建成功, id={new_item['id']}")
     return new_item
 
 
 @app.put("/items/{item_id}", response_model=Item)
 async def update_item(item_id: int, item: ItemCreate):
     """更新物品信息"""
+    logger.info(f"[API] update_item(id={item_id}, name={item.name}, price={item.price}, quantity={item.quantity})")
     if item_id not in _items_db:
+        logger.warning(f"[API] update_item(id={item_id}) -> 404 未找到")
         raise HTTPException(status_code=404, detail="Item not found")
     updated_item = {"id": item_id, **item.model_dump()}
     _items_db[item_id] = updated_item
+    logger.info(f"[API] update_item(id={item_id}) -> 更新成功")
     return updated_item
 
 
 @app.delete("/items/{item_id}")
 async def delete_item(item_id: int):
     """删除物品"""
+    logger.info(f"[API] delete_item(id={item_id})")
     if item_id not in _items_db:
+        logger.warning(f"[API] delete_item(id={item_id}) -> 404 未找到")
         raise HTTPException(status_code=404, detail="Item not found")
+    deleted_name = _items_db[item_id]["name"]
     del _items_db[item_id]
+    logger.info(f"[API] delete_item(id={item_id}) -> 已删除 '{deleted_name}'")
     return {"message": f"Item {item_id} deleted"}
 
 
