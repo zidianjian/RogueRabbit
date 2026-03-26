@@ -4,11 +4,3 @@ __pycache__/
 
 # Environment variables (contains secrets - DO NOT COMMIT)
 .env
-
-# Build artifacts
-*.egg-info/
-dist/
-build/
-
-# IDE
-.claude/
