@@ -119,17 +119,8 @@ async def demo_real_server() -> None:
     print(f"  命令: {config.command} {' '.join(config.args)}")
 
     print("\n注意: 此示例需要实际运行的 MCP 服务器")
-    print("如果没有服务器，将跳过此演示")
-
-    # 尝试连接（如果服务器可用）
-    try:
-        async with create_mcp_client(config) as client:
-            tools = await client.list_tools()
-            print(f"\n发现 {len(tools)} 个工具:")
-            for tool in tools:
-                print(f"  - {tool.name}: {tool.description}")
-    except Exception as e:
-        print(f"\n连接失败（这是正常的，如果服务器未运行）: {e}")
+    print("要连接真实服务器，请运行实验 06_mcp_real.py")
+    print("已跳过此演示（避免异步清理错误）")
 
 
 # ========================================
