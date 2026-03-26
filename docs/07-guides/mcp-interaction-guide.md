@@ -144,9 +144,11 @@ async with create_mcp_client(config) as client:
 - `adapters/mcp_client.py` - MCP 客户端实现
 - `experiments/04_mcp_basic.py` - 基础 MCP 调用示例
 - `experiments/05_mcp_with_llm.py` - LLM + MCP 组合示例
+- `experiments/06_mcp_real.py` - 真实 LLM + 真实 MCP
 - `notebooks/02_mcp_basics.ipynb` - MCP 学习 notebook
 
 ## 延伸阅读
 
+- [REST + MCP + LLM 集成指南](./rest-integration-guide.md)
 - [MCP 官方规范](https://modelcontextprotocol.io/)
 - [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
