@@ -92,9 +92,11 @@ class SkillAgent:
             for kw in keywords:
                 if kw in question_lower:
                     if self._manager.has_skill(skill_name):
+                        self._log(f"[关键词匹配] 命中关键词 '{kw}' -> Skill: {skill_name}")
                         return skill_name
                     break
 
+        self._log("[关键词匹配] 未匹配到任何 Skill")
         return None
 
     def _select_skill_via_llm(self, question: str) -> str | None:
@@ -262,7 +264,9 @@ async def run_demo():
     for question in test_questions:
         answer = agent.run(question)
         print(f"\n{'='*50}")
-        print(f"[最终答案]\n{answer}")
+        # 安全打印，处理 Unicode 字符
+        safe_answer = answer.encode('gbk', errors='replace').decode('gbk')
+        print(f"[最终答案]\n{safe_answer}")
 
     # 总结
     print("\n" + "=" * 60)
