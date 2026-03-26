@@ -24,6 +24,10 @@ MCP 工具调用:
 REST + MCP + LLM:
 - 07_rest_mcp_llm: REST API + MCP Server + LLM 完整演示
 
+Skill 调用:
+- 08_skill_basic: Skill 基础调用
+- 09_skill_with_llm: LLM + Skill 集成
+
 运行方式:
 ========
     python -m rogue_rabbit.experiments.01_hello_llm
@@ -33,6 +37,8 @@ REST + MCP + LLM:
     python -m rogue_rabbit.experiments.05_mcp_with_llm
     python -m rogue_rabbit.experiments.06_mcp_real
     python -m rogue_rabbit.experiments.07_rest_mcp_llm
+    python -m rogue_rabbit.experiments.08_skill_basic
+    python -m rogue_rabbit.experiments.09_skill_with_llm
 """
 
 __all__ = []

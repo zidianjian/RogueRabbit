@@ -21,6 +21,7 @@ contracts 包 - 协议与数据模型
 2. 再理解 LLMClient Protocol - 这是抽象层的核心
 3. 最后理解 MockLLMClient - 这是测试和学习的工具
 4. v0.2 新增: MCP 相关的数据模型和协议
+5. v0.3 新增: Skill 相关的数据模型
 """
 
 from rogue_rabbit.contracts.llm import LLMClient, MockLLMClient
@@ -38,6 +39,7 @@ from rogue_rabbit.contracts.mcp import (
     MCPTransportType,
     MockMCPClient,
 )
+from rogue_rabbit.contracts.skill import Skill, SkillDiscoveryResult, SkillMeta
 
 __all__ = [
     # 消息相关
@@ -59,4 +61,8 @@ __all__ = [
     "MCPServerConfig",
     "MCPTransportType",
     "MockMCPClient",
+    # Skill 相关 (v0.3 新增)
+    "Skill",
+    "SkillMeta",
+    "SkillDiscoveryResult",
 ]
