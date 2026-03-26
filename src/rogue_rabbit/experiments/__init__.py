@@ -28,6 +28,10 @@ Skill 调用:
 - 08_skill_basic: Skill 基础调用
 - 09_skill_with_llm: LLM + Skill 集成
 
+Session 会话管理:
+- 10_session_basic: 基础会话管理
+- 11_session_persistence: 会话持久化
+
 运行方式:
 ========
     python -m rogue_rabbit.experiments.01_hello_llm
@@ -39,6 +43,8 @@ Skill 调用:
     python -m rogue_rabbit.experiments.07_rest_mcp_llm
     python -m rogue_rabbit.experiments.08_skill_basic
     python -m rogue_rabbit.experiments.09_skill_with_llm
+    python -m rogue_rabbit.experiments.10_session_basic
+    python -m rogue_rabbit.experiments.11_session_persistence
 """
 
 __all__ = []

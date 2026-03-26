@@ -24,7 +24,8 @@ RogueRabbit 是一个用 Python 构建的 agent 学习与工程化项目。
 | 0.2 | MCP 调用最小闭环 | ✅ 完成 |
 | 0.2.1 | REST + MCP Server + LLM 集成 | ✅ 完成 |
 | 0.3 | Skill 调用最小闭环 | ✅ 完成 |
-| 0.4 | Session 管理 | 📋 计划中 |
+| 0.4 | Session 会话管理 | ✅ 完成 |
+| 0.5 | Memory 记忆管理 | 📋 计划中 |
 
 ## 快速开始
 
@@ -37,6 +38,8 @@ python -m rogue_rabbit.experiments.01_hello_llm
 python -m rogue_rabbit.experiments.06_mcp_real
 python -m rogue_rabbit.experiments.07_rest_mcp_llm
 python -m rogue_rabbit.experiments.08_skill_basic
+python -m rogue_rabbit.experiments.10_session_basic
+python -m rogue_rabbit.experiments.11_session_persistence
 ```
 
 ## 实验列表
@@ -58,6 +61,10 @@ python -m rogue_rabbit.experiments.08_skill_basic
 - `08_skill_basic`: Skill 基础调用
 - `09_skill_with_llm`: LLM + Skill 集成
 
+### Session 会话管理 (v0.4)
+- `10_session_basic`: 基础会话管理
+- `11_session_persistence`: 会话持久化
+
 ## 架构
 
 ```
@@ -65,8 +72,9 @@ src/rogue_rabbit/
 ├── adapters/       # 外部服务适配器（LLM, MCP）
 ├── apps/           # 应用入口（CLI, REST）
 │   └── rest/       # FastAPI REST 应用
-├── contracts/      # 核心接口定义
-├── core/           # 核心功能（ReAct Agent, Skill Manager）
+├── contracts/      # 核心接口定义（Message, Session, Skill, MCP）
+├── core/           # 核心功能（ReAct Agent, Skill Manager, Session Manager）
+├── runtime/        # 运行时组件（Session Store）
 ├── servers/        # MCP Server 实现
 ├── skills/         # 内置 Skills
 │   ├── calculator/ # 数学计算
@@ -75,15 +83,15 @@ src/rogue_rabbit/
 └── experiments/    # 学习实验
 ```
 
-## Skill vs MCP
+## Skill vs MCP vs Session
 
-| 特性 | MCP | Skill |
-|------|-----|-------|
-| 类型 | 工具/函数 | 提示词扩展 |
-| 输入 | 结构化参数 | 自然语言 |
-| 输出 | 结构化结果 | 指导性内容 |
-| 调用方式 | Tool Call | 上下文注入 |
-| 适合场景 | 明确的输入输出操作 | 需要灵活处理的任务 |
+| 特性 | MCP | Skill | Session |
+|------|-----|-------|---------|
+| 类型 | 工具/函数 | 提示词扩展 | 会话管理 |
+| 输入 | 结构化参数 | 自然语言 | 对话消息 |
+| 输出 | 结构化结果 | 指导性内容 | 对话历史 |
+| 调用方式 | Tool Call | 上下文注入 | 生命周期管理 |
+| 适合场景 | 明确操作 | 灵活任务 | 多轮对话 |
 
 ## 启动脚本
 

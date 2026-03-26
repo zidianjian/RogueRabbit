@@ -55,6 +55,14 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
   - 添加 Skill 交互指南
   - 更新 notebooks
 
+### v0.4.x - Session 会话管理
+- **0.4.0**: Session 管理最小闭环
+  - Session 协议定义（Session, SessionMeta, SessionStatus）
+  - SessionManager 会话生命周期管理
+  - ContextWindowManager 上下文窗口控制
+  - 存储后端（MemorySessionStore, FileSessionStore）
+  - 实验: 10-11
+
 ---
 
 ## Phase 1 计划
@@ -63,7 +71,7 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 
 | 版本 | 功能 | 描述 | 状态 |
 |------|------|------|------|
-| **0.4** | **Session 管理** | 会话生命周期、对话历史、上下文控制 | 📋 计划中 |
+| **0.4** | **Session 管理** | 会话生命周期、对话历史、上下文控制 | ✅ 已完成 |
 | **0.5** | **Memory** | 长期记忆、知识存储、检索机制 | 📋 计划中 |
 
 ### 安全与可观测层

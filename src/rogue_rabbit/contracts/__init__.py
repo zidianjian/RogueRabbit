@@ -40,6 +40,7 @@ from rogue_rabbit.contracts.mcp import (
     MockMCPClient,
 )
 from rogue_rabbit.contracts.skill import Skill, SkillDiscoveryResult, SkillMeta
+from rogue_rabbit.contracts.session import Session, SessionMeta, SessionStatus, SessionStore
 
 __all__ = [
     # 消息相关
@@ -65,4 +66,9 @@ __all__ = [
     "Skill",
     "SkillMeta",
     "SkillDiscoveryResult",
+    # Session 相关 (v0.4 新增)
+    "Session",
+    "SessionMeta",
+    "SessionStatus",
+    "SessionStore",
 ]
