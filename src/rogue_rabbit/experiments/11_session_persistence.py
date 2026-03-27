@@ -98,46 +98,49 @@ def demo_file_store() -> None:
     print("Demo 2: 文件存储")
     print("-" * 60)
 
-    # 使用临时目录
-    with tempfile.TemporaryDirectory() as tmpdir:
-        store_path = Path(tmpdir)
-        print(f"[初始化] 存储目录: {store_path}")
+    # 使用固定目录（便于查看文件内容）
+    store_path = Path(__file__).parent.parent.parent.parent / "tmp_sessions"
+    print(f"[初始化] 存储目录: {store_path}")
 
-        # 创建文件存储
-        store = FileSessionStore(store_path)
+    # 创建文件存储
+    store = FileSessionStore(store_path)
 
-        # 创建并保存会话
-        session = Session(
-            meta=SessionMeta(metadata={"demo": "file"}),
-            system_prompt="你是助手",
-        )
-        store.save(session)
-        print(f"[保存] 会话ID: {session.meta.session_id}")
+    # 创建并保存会话
+    session = Session(
+        meta=SessionMeta(metadata={"demo": "file"}),
+        system_prompt="你是助手",
+    )
+    store.save(session)
+    print(f"[保存] 会话ID: {session.meta.session_id}")
 
-        # 查看文件
-        files = list(store_path.glob("*.json"))
-        print(f"[文件] 创建了 {len(files)} 个文件: {[f.name for f in files]}")
+    # 查看文件
+    files = list(store_path.glob("*.json"))
+    print(f"[文件] 创建了 {len(files)} 个文件: {[f.name for f in files]}")
 
-        # 加载会话
-        loaded = store.load(session.meta.session_id)
-        print(f"[加载] 会话ID: {loaded.meta.session_id}")
+    # 加载会话
+    loaded = store.load(session.meta.session_id)
+    print(f"[加载] 会话ID: {loaded.meta.session_id}")
 
-        # 修改并保存
-        from rogue_rabbit.contracts import Message, Role
+    # 修改并保存
+    from rogue_rabbit.contracts import Message, Role
 
-        loaded.add_message(Message(role=Role.USER, content="测试消息"))
-        store.save(loaded)
-        print(f"[更新] 添加了消息")
+    loaded.add_message(Message(role=Role.USER, content="测试消息"))
+    store.save(loaded)
+    print(f"[更新] 添加了消息")
 
-        # 重新加载验证
-        reloaded = store.load(session.meta.session_id)
-        print(f"[验证] 消息数: {len(reloaded.messages)}")
+    # 重新加载验证
+    reloaded = store.load(session.meta.session_id)
+    print(f"[验证] 消息数: {len(reloaded.messages)}")
 
-        # 优势说明
-        print("\n[优势] 文件存储的特点:")
-        print("  - 数据持久化，进程重启后保留")
-        print("  - 文件格式可读（JSON）")
-        print("  - 适合单机部署")
+    # 读取文件内容展示
+    json_file = store_path / f"{session.meta.session_id}.json"
+    print(f"\n[文件内容] {json_file}:")
+    print(json_file.read_text(encoding="utf-8")[:300] + "...")
+
+    # 清理
+    store.clear()
+    store_path.rmdir()
+    print(f"\n[清理] 已删除临时目录")
 
     print("\n[完成] 文件存储演示结束")
 
