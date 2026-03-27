@@ -262,6 +262,14 @@ def demo_session_export_import() -> None:
 
 def main() -> None:
     """主函数"""
+    import logging
+
+    logging.basicConfig(level=logging.INFO, format="%(name)s - %(message)s")
+    # 只显示项目自身的日志，屏蔽第三方库
+    logging.getLogger("openai").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+
     print("=" * 60)
     print("实验 11: 会话持久化")
     print("=" * 60)
