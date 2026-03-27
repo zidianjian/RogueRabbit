@@ -25,7 +25,7 @@ RogueRabbit 是一个用 Python 构建的 agent 学习与工程化项目。
 | 0.2.1 | REST + MCP Server + LLM 集成 | ✅ 完成 |
 | 0.3 | Skill 调用最小闭环 | ✅ 完成 |
 | 0.4 | Session 会话管理 | ✅ 完成 |
-| 0.5 | Memory 记忆管理 | 📋 计划中 |
+| 0.5 | Memory 记忆管理 | ✅ 完成 |
 
 ## 快速开始
 
@@ -40,6 +40,8 @@ python -m rogue_rabbit.experiments.07_rest_mcp_llm
 python -m rogue_rabbit.experiments.08_skill_basic
 python -m rogue_rabbit.experiments.10_session_basic
 python -m rogue_rabbit.experiments.11_session_persistence
+python -m rogue_rabbit.experiments.12_memory_basic
+python -m rogue_rabbit.experiments.13_memory_with_session
 ```
 
 ## 实验列表
@@ -64,6 +66,10 @@ python -m rogue_rabbit.experiments.11_session_persistence
 ### Session 会话管理 (v0.4)
 - `10_session_basic`: 基础会话管理
 - `11_session_persistence`: 会话持久化
+
+### Memory 记忆管理 (v0.5)
+- `12_memory_basic`: 基础记忆操作
+- `13_memory_with_session`: 记忆与会话集成
 
 ## 架构
 

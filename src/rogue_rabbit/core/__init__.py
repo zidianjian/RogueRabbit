@@ -9,6 +9,7 @@ from rogue_rabbit.core.context_window import (
     ContextWindowManager,
     TruncationStrategy,
 )
+from rogue_rabbit.core.memory_manager import MemoryManager
 from rogue_rabbit.core.react_agent import ReActAgent
 from rogue_rabbit.core.session_manager import SessionManager
 from rogue_rabbit.core.skill_manager import SkillManager
@@ -21,4 +22,6 @@ __all__ = [
     "ContextWindowManager",
     "ContextWindowConfig",
     "TruncationStrategy",
+    # Memory 相关 (v0.5 新增)
+    "MemoryManager",
 ]

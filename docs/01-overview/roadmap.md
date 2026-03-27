@@ -63,6 +63,15 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
   - 存储后端（MemorySessionStore, FileSessionStore）
   - 实验: 10-11
 
+### v0.5.x - Memory 长期记忆
+- **0.5.0**: Memory 记忆管理最小闭环
+  - Memory 协议定义（MemoryItem, MemoryMeta, Memory）
+  - MemoryManager 记忆管理器
+  - 记忆检索（关键词匹配、分类过滤、重要性排序）
+  - 存储后端（InMemoryStore, FileMemoryStore）
+  - Session + Memory 集成
+  - 实验: 12-13
+
 ---
 
 ## Phase 1 计划
@@ -72,7 +81,7 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 | 版本 | 功能 | 描述 | 状态 |
 |------|------|------|------|
 | **0.4** | **Session 管理** | 会话生命周期、对话历史、上下文控制 | ✅ 已完成 |
-| **0.5** | **Memory** | 长期记忆、知识存储、检索机制 | 📋 计划中 |
+| **0.5** | **Memory** | 长期记忆、知识存储、检索机制 | ✅ 已完成 |
 
 ### 安全与可观测层
 
@@ -117,15 +126,14 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 学会记忆总结和遗忘
 
 核心概念:
-- Memory: 记忆存储接口
-- MemoryItem: 单条记忆（内容、时间、重要性）
-- MemoryStore: 存储后端（内存/文件/向量数据库）
-- Retriever: 记忆检索（关键词/向量相似性）
+- MemoryItem: 单条记忆（内容、时间、重要性、分类）
+- Memory: 记忆空间（按 user_id 组织）
+- MemoryManager: 记忆管理器
+- MemoryStore: 存储后端（InMemoryStore, FileMemoryStore）
 
 实验:
 - 12_memory_basic: 基础记忆操作
 - 13_memory_with_session: 记忆与会话集成
-- 14_memory_retrieval: 记忆检索策略
 ```
 
 ### 0.6 Permissions

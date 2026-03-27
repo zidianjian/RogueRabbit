@@ -32,6 +32,10 @@ Session 会话管理:
 - 10_session_basic: 基础会话管理
 - 11_session_persistence: 会话持久化
 
+Memory 记忆管理:
+- 12_memory_basic: 基础记忆操作
+- 13_memory_with_session: 记忆与会话集成
+
 运行方式:
 ========
     python -m rogue_rabbit.experiments.01_hello_llm
@@ -45,6 +49,8 @@ Session 会话管理:
     python -m rogue_rabbit.experiments.09_skill_with_llm
     python -m rogue_rabbit.experiments.10_session_basic
     python -m rogue_rabbit.experiments.11_session_persistence
+    python -m rogue_rabbit.experiments.12_memory_basic
+    python -m rogue_rabbit.experiments.13_memory_with_session
 """
 
 __all__ = []

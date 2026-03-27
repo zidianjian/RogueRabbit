@@ -10,7 +10,7 @@
 | **MCP** | v0.2.x | ✅ 已完成 | MCP 工具调用，支持 STDIO/HTTP |
 | **Skill** | v0.3.x | ✅ 已完成 | Skill 知识包，上下文注入 |
 | **Session** | v0.4.x | ✅ 已完成 | 会话管理，生命周期，持久化 |
-| **Memory** | v0.5.x | 📋 计划中 | 长期记忆，知识存储，检索 |
+| **Memory** | v0.5.x | ✅ 已完成 | 长期记忆，知识存储，检索 |
 | **Permissions** | v0.6.x | 📋 计划中 | 权限控制，安全边界 |
 | **Logging** | v0.7.x | 📋 计划中 | 结构化日志，追踪 |
 | **Agent Team** | v0.8.x | 📋 计划中 | 多 Agent 协作 |
@@ -93,6 +93,29 @@ Skill 知识包能力。
 - 多种存储后端（内存/文件）
 - 上下文窗口控制（多种截断策略）
 - 会话序列化和恢复
+
+---
+
+### Memory (v0.5.x)
+
+长期记忆能力。
+
+**核心组件：**
+- `contracts/memory.py`: Memory 协议定义（MemoryItem, Memory, MemoryStore）
+- `core/memory_manager.py`: Memory 管理器
+- `runtime/memory_store.py`: 存储后端（InMemoryStore, FileMemoryStore）
+
+**学习资源：**
+- `experiments/12_memory_basic.py`
+- `experiments/13_memory_with_session.py`
+- `notebooks/06_memory_basics.ipynb`
+- `docs/07-guides/memory-interaction-guide.md`
+
+**关键特性：**
+- 记忆分类和重要性评分
+- 关键词搜索和过滤
+- LLM 记忆摘要生成
+- 与 Session 集成（记忆注入上下文）
 
 ---
 
