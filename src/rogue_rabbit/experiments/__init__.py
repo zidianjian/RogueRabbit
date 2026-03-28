@@ -36,6 +36,9 @@ Memory 记忆管理:
 - 12_memory_basic: 基础记忆操作
 - 13_memory_with_session: 记忆与会话集成
 
+知识检测:
+- 14_knowledge_check: 测试 v0.1-v0.5 掌握程度
+
 运行方式:
 ========
     python -m rogue_rabbit.experiments.01_hello_llm
@@ -50,7 +53,8 @@ Memory 记忆管理:
     python -m rogue_rabbit.experiments.10_session_basic
     python -m rogue_rabbit.experiments.11_session_persistence
     python -m rogue_rabbit.experiments.12_memory_basic
-    python -m rogue_rabbit.experiments.13_memory_with_session
+        python -m rogue_rabbit.experiments.13_memory_with_session
+    python -m rogue_rabbit.experiments.14_knowledge_check
 """
 
 __all__ = []
