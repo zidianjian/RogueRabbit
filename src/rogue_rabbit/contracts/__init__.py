@@ -42,6 +42,14 @@ from rogue_rabbit.contracts.mcp import (
 from rogue_rabbit.contracts.skill import Skill, SkillDiscoveryResult, SkillMeta
 from rogue_rabbit.contracts.session import Session, SessionMeta, SessionStatus, SessionStore
 from rogue_rabbit.contracts.memory import Memory, MemoryItem, MemoryMeta, MemoryStore
+from rogue_rabbit.contracts.permission import (
+    AccessRequest,
+    AccessResult,
+    Effect,
+    Permission,
+    Policy,
+    PolicyStore,
+)
 
 __all__ = [
     # 消息相关
@@ -77,4 +85,11 @@ __all__ = [
     "MemoryItem",
     "MemoryMeta",
     "MemoryStore",
+    # Permission 相关 (v0.6 新增)
+    "AccessRequest",
+    "AccessResult",
+    "Effect",
+    "Permission",
+    "Policy",
+    "PolicyStore",
 ]

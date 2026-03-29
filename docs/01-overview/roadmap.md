@@ -82,12 +82,13 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 |------|------|------|------|
 | **0.4** | **Session 管理** | 会话生命周期、对话历史、上下文控制 | ✅ 已完成 |
 | **0.5** | **Memory** | 长期记忆、知识存储、检索机制 | ✅ 已完成 |
+| **0.6** | **Permissions** | 工具权限、资源访问控制、安全边界 | ✅ 已完成 |
 
 ### 安全与可观测层
 
 | 版本 | 功能 | 描述 | 状态 |
 |------|------|------|------|
-| **0.6** | **Permissions** | 工具权限、资源访问控制、安全边界 | 📋 计划中 |
+| **0.6** | **Permissions** | 工具权限、资源访问控制、安全边界 | ✅ 已完成 |
 | **0.7** | **Logging** | 结构化日志、追踪、性能监控 | 📋 计划中 |
 
 ### 协作与集成层
@@ -134,6 +135,26 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 实验:
 - 12_memory_basic: 基础记忆操作
 - 13_memory_with_session: 记忆与会话集成
+```
+
+### 0.6 Permissions
+```
+学习目标:
+- 理解 Agent 安全边界
+- 掌握权限控制机制（DENY 优先、默认拒绝）
+- 学会用户授权流程和 RBAC
+
+核心概念:
+- Permission: 权限规则（action + resource + effect）
+- Policy: 策略集合，绑定角色
+- AccessRequest/AccessResult: 授权检查
+- Authorizer: 授权管理器
+- PolicyStore: 存储后端（InMemoryPolicyStore, FilePolicyStore）
+
+实验:
+- 15_permission_basic: 基础权限检查
+- 16_tool_permission: 工具调用权限
+- 17_resource_permission: 资源访问控制
 ```
 
 ### 0.6 Permissions

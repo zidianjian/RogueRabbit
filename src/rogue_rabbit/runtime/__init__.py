@@ -5,6 +5,7 @@ runtime 包 - 运行时组件
 """
 
 from rogue_rabbit.runtime.memory_store import FileMemoryStore, InMemoryStore
+from rogue_rabbit.runtime.policy_store import FilePolicyStore, InMemoryPolicyStore
 from rogue_rabbit.runtime.session_store import FileSessionStore, MemorySessionStore
 
 __all__ = [
@@ -14,4 +15,7 @@ __all__ = [
     # Memory 存储后端 (v0.5 新增)
     "InMemoryStore",
     "FileMemoryStore",
+    # Policy 存储后端 (v0.6 新增)
+    "InMemoryPolicyStore",
+    "FilePolicyStore",
 ]

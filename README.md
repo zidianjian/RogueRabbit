@@ -26,6 +26,7 @@ RogueRabbit 是一个用 Python 构建的 agent 学习与工程化项目。
 | 0.3 | Skill 调用最小闭环 | ✅ 完成 |
 | 0.4 | Session 会话管理 | ✅ 完成 |
 | 0.5 | Memory 记忆管理 | ✅ 完成 |
+| 0.6 | Permissions 权限控制 | ✅ 完成 |
 
 ## 快速开始
 
@@ -42,6 +43,9 @@ python -m rogue_rabbit.experiments.10_session_basic
 python -m rogue_rabbit.experiments.11_session_persistence
 python -m rogue_rabbit.experiments.12_memory_basic
 python -m rogue_rabbit.experiments.13_memory_with_session
+python -m rogue_rabbit.experiments.15_permission_basic
+python -m rogue_rabbit.experiments.16_tool_permission
+python -m rogue_rabbit.experiments.17_resource_permission
 ```
 
 ## 实验列表
@@ -71,6 +75,11 @@ python -m rogue_rabbit.experiments.13_memory_with_session
 - `12_memory_basic`: 基础记忆操作
 - `13_memory_with_session`: 记忆与会话集成
 
+### Permissions 权限控制 (v0.6)
+- `15_permission_basic`: 基础权限检查
+- `16_tool_permission`: 工具调用权限
+- `17_resource_permission`: 资源访问控制
+
 ## 架构
 
 ```
@@ -78,9 +87,9 @@ src/rogue_rabbit/
 ├── adapters/       # 外部服务适配器（LLM, MCP）
 ├── apps/           # 应用入口（CLI, REST）
 │   └── rest/       # FastAPI REST 应用
-├── contracts/      # 核心接口定义（Message, Session, Skill, MCP）
-├── core/           # 核心功能（ReAct Agent, Skill Manager, Session Manager）
-├── runtime/        # 运行时组件（Session Store）
+├── contracts/      # 核心接口定义（Message, Session, Skill, MCP, Permission）
+├── core/           # 核心功能（ReAct Agent, Skill Manager, Session Manager, Authorizer）
+├── runtime/        # 运行时组件（Session Store, Policy Store）
 ├── servers/        # MCP Server 实现
 ├── skills/         # 内置 Skills
 │   ├── calculator/ # 数学计算
@@ -91,13 +100,13 @@ src/rogue_rabbit/
 
 ## Skill vs MCP vs Session
 
-| 特性 | MCP | Skill | Session |
-|------|-----|-------|---------|
-| 类型 | 工具/函数 | 提示词扩展 | 会话管理 |
-| 输入 | 结构化参数 | 自然语言 | 对话消息 |
-| 输出 | 结构化结果 | 指导性内容 | 对话历史 |
-| 调用方式 | Tool Call | 上下文注入 | 生命周期管理 |
-| 适合场景 | 明确操作 | 灵活任务 | 多轮对话 |
+| 特性 | MCP | Skill | Session | Permission |
+|------|-----|-------|---------|------------|
+| 类型 | 工具/函数 | 提示词扩展 | 会话管理 | 权限控制 |
+| 输入 | 结构化参数 | 自然语言 | 对话消息 | 访问请求 |
+| 输出 | 结构化结果 | 指导性内容 | 对话历史 | 允许/拒绝 |
+| 调用方式 | Tool Call | 上下文注入 | 生命周期管理 | 授权检查 |
+| 适合场景 | 明确操作 | 灵活任务 | 多轮对话 | 安全边界 |
 
 ## 启动脚本
 

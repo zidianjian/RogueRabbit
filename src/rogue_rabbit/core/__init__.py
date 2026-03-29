@@ -10,6 +10,7 @@ from rogue_rabbit.core.context_window import (
     TruncationStrategy,
 )
 from rogue_rabbit.core.memory_manager import MemoryManager
+from rogue_rabbit.core.authorizer import Authorizer
 from rogue_rabbit.core.react_agent import ReActAgent
 from rogue_rabbit.core.session_manager import SessionManager
 from rogue_rabbit.core.skill_manager import SkillManager
@@ -24,4 +25,6 @@ __all__ = [
     "TruncationStrategy",
     # Memory 相关 (v0.5 新增)
     "MemoryManager",
+    # Permission 相关 (v0.6 新增)
+    "Authorizer",
 ]
