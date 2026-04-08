@@ -9,6 +9,7 @@ from rogue_rabbit.core.context_window import (
     ContextWindowManager,
     TruncationStrategy,
 )
+from rogue_rabbit.core.log_manager import MetricsCollector, StructuredLogger, Tracer
 from rogue_rabbit.core.memory_manager import MemoryManager
 from rogue_rabbit.core.authorizer import Authorizer
 from rogue_rabbit.core.react_agent import ReActAgent
@@ -27,4 +28,8 @@ __all__ = [
     "MemoryManager",
     # Permission 相关 (v0.6 新增)
     "Authorizer",
+    # Logging 相关 (v0.7 新增)
+    "StructuredLogger",
+    "Tracer",
+    "MetricsCollector",
 ]

@@ -50,6 +50,18 @@ from rogue_rabbit.contracts.permission import (
     Policy,
     PolicyStore,
 )
+from rogue_rabbit.contracts.log import (
+    LogLevel,
+    LogEntry,
+    LogStore,
+    Span,
+    SpanEvent,
+    SpanStatus,
+    SpanStore,
+    MetricType,
+    MetricPoint,
+    MetricStore,
+)
 
 __all__ = [
     # 消息相关
@@ -92,4 +104,15 @@ __all__ = [
     "Permission",
     "Policy",
     "PolicyStore",
+    # Logging 相关 (v0.7 新增)
+    "LogLevel",
+    "LogEntry",
+    "LogStore",
+    "Span",
+    "SpanEvent",
+    "SpanStatus",
+    "SpanStore",
+    "MetricType",
+    "MetricPoint",
+    "MetricStore",
 ]

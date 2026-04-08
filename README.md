@@ -27,6 +27,7 @@ RogueRabbit 是一个用 Python 构建的 agent 学习与工程化项目。
 | 0.4 | Session 会话管理 | ✅ 完成 |
 | 0.5 | Memory 记忆管理 | ✅ 完成 |
 | 0.6 | Permissions 权限控制 | ✅ 完成 |
+| 0.7 | Logging 可观测性 | ✅ 完成 |
 
 ## 快速开始
 
@@ -80,6 +81,11 @@ python -m rogue_rabbit.experiments.17_resource_permission
 - `16_tool_permission`: 工具调用权限
 - `17_resource_permission`: 资源访问控制
 
+### Logging 可观测性 (v0.7)
+- `18_logging_basic`: 结构化日志
+- `19_tracing`: 请求追踪
+- `20_debugging`: 调试支持
+
 ## 架构
 
 ```
@@ -87,9 +93,9 @@ src/rogue_rabbit/
 ├── adapters/       # 外部服务适配器（LLM, MCP）
 ├── apps/           # 应用入口（CLI, REST）
 │   └── rest/       # FastAPI REST 应用
-├── contracts/      # 核心接口定义（Message, Session, Skill, MCP, Permission）
-├── core/           # 核心功能（ReAct Agent, Skill Manager, Session Manager, Authorizer）
-├── runtime/        # 运行时组件（Session Store, Policy Store）
+├── contracts/      # 核心接口定义（Message, Session, Skill, MCP, Permission, Log）
+├── core/           # 核心功能（ReAct Agent, Skill Manager, Session Manager, Authorizer, Logger）
+├── runtime/        # 运行时组件（Session Store, Policy Store, Log Store）
 ├── servers/        # MCP Server 实现
 ├── skills/         # 内置 Skills
 │   ├── calculator/ # 数学计算
