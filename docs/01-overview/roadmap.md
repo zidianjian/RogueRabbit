@@ -13,6 +13,8 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
                                                     ↓
                         Logging ← Permissions ←────┘
                               ↓
+                      Checkpoint & Restore
+                              ↓
                          Agent Team
                               ↓
                          Integration
@@ -95,8 +97,9 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 
 | 版本 | 功能 | 描述 | 状态 |
 |------|------|------|------|
-| **0.8** | **Agent Team** | 多 Agent 通信、任务分解、协作模式 | 📋 计划中 |
-| **0.9** | **Integration** | 配置管理、错误处理、完整应用 | 📋 计划中 |
+| **0.8** | **Checkpoint** | 会话快照、链式检查点、状态恢复与分支 | 📋 计划中 |
+| **0.9** | **Agent Team** | 多 Agent 通信、任务分解、协作模式 | 📋 计划中 |
+| **0.10** | **Integration** | 配置管理、错误处理、完整应用 | 📋 计划中 |
 
 ---
 
@@ -157,24 +160,6 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 17_resource_permission: 资源访问控制
 ```
 
-### 0.6 Permissions
-```
-学习目标:
-- 理解 Agent 安全边界
-- 掌握权限控制机制
-- 学会用户授权流程
-
-核心概念:
-- Permission: 权限定义
-- Policy: 权限策略
-- Authorizer: 授权检查
-
-实验:
-- 15_permission_basic: 基础权限检查
-- 16_tool_permission: 工具调用权限
-- 17_resource_permission: 资源访问控制
-```
-
 ### 0.7 Logging
 ```
 学习目标:
@@ -193,7 +178,30 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 20_debugging: 调试支持
 ```
 
-### 0.8 Agent Team
+### 0.8 Checkpoint & Restore
+```
+学习目标:
+- 理解 OpenAI 的链式引用（previous_response_id）和 Claude Code 的本地快照原理
+- 掌握检查点的创建、恢复和分支
+- 学会会话状态快照与回滚
+
+核心概念:
+- Checkpoint: 会话状态快照（消息历史 + 元数据）
+- CheckpointManager: 检查点管理器（创建/恢复/分支/谱系查询）
+- CheckpointStore: 存储后端（InMemoryCheckpointStore, FileCheckpointStore）
+- 链式引用: parent_id 支持检查点树和分支
+- 正交恢复: 消息历史和运行状态独立管理
+
+设计原则（提炼自 OpenAI 和 Claude Code）:
+- 快照粒度: 每次关键操作前保存状态
+- 链式引用: 通过 ID 引用历史节点，支持分支
+- 自动触发: 关键操作时自动创建检查点
+
+实验:
+- 19_checkpoint_basic: 检查点创建、恢复与分支
+```
+
+### 0.9 Agent Team
 ```
 学习目标:
 - 理解多 Agent 协作模式
@@ -212,7 +220,7 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 23_collaboration: 协作模式
 ```
 
-### 0.9 Integration
+### 0.10 Integration
 ```
 学习目标:
 - 理解完整 Agent 应用架构

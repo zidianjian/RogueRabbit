@@ -11,9 +11,10 @@
 | **Skill** | v0.3.x | ✅ 已完成 | Skill 知识包，上下文注入 |
 | **Session** | v0.4.x | ✅ 已完成 | 会话管理，生命周期，持久化 |
 | **Memory** | v0.5.x | ✅ 已完成 | 长期记忆，知识存储，检索 |
-| **Permissions** | v0.6.x | 📋 计划中 | 权限控制，安全边界 |
-| **Logging** | v0.7.x | 📋 计划中 | 结构化日志，追踪 |
-| **Agent Team** | v0.8.x | 📋 计划中 | 多 Agent 协作 |
+| **Permissions** | v0.6.x | ✅ 已完成 | 权限控制，安全边界 |
+| **Logging** | v0.7.x | ✅ 已完成 | 结构化日志，追踪 |
+| **Checkpoint** | v0.8.x | 📋 计划中 | 会话快照、链式检查点、状态恢复与分支 |
+| **Agent Team** | v0.9.x | 📋 计划中 | 多 Agent 协作 |
 
 ## 能力详情
 
@@ -126,10 +127,34 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
                                                     ↓
                         Logging ← Permissions ←────┘
                               ↓
+                      Checkpoint & Restore
+                              ↓
                          Agent Team
                               ↓
                          Integration
 ```
+
+---
+
+### Checkpoint (v0.8.x)
+
+会话检查点与恢复能力。
+
+**核心组件：**
+- `contracts/checkpoint.py`: Checkpoint 协议定义（Checkpoint, CheckpointSnapshot, CheckpointStore）
+- `core/checkpoint_manager.py`: 检查点管理器
+- `runtime/checkpoint_store.py`: 存储后端（InMemoryCheckpointStore, FileCheckpointStore）
+
+**学习资源：**
+- `experiments/19_checkpoint_basic.py`
+- `notebooks/09_checkpoint_basics.ipynb`
+
+**关键特性：**
+- 会话状态快照（消息历史 + 元数据）
+- 链式检查点（parent_id 支持分支，源于 OpenAI previous_response_id 思想）
+- 状态恢复与回滚（源于 Claude Code 本地快照思想）
+- 检查点谱系查询（get_lineage 追溯完整路径）
+- 文件持久化（JSONL 格式）
 
 ## 扩展指南
 
