@@ -15,6 +15,8 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
                               ↓
                       Checkpoint & Restore
                               ↓
+                         Planning
+                              ↓
                          Agent Team
                               ↓
                          Integration
@@ -98,8 +100,9 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 | 版本 | 功能 | 描述 | 状态 |
 |------|------|------|------|
 | **0.8** | **Checkpoint** | 会话快照、链式检查点、状态恢复与分支 | 📋 计划中 |
-| **0.9** | **Agent Team** | 多 Agent 通信、任务分解、协作模式 | 📋 计划中 |
-| **0.10** | **Integration** | 配置管理、错误处理、完整应用 | 📋 计划中 |
+| **0.9** | **Planning** | 任务分解、计划生成、执行与重规划 | 📋 计划中 |
+| **0.10** | **Agent Team** | 多 Agent 通信、任务分解、协作模式 | 📋 计划中 |
+| **0.11** | **Integration** | 配置管理、错误处理、完整应用 | 📋 计划中 |
 
 ---
 
@@ -201,7 +204,35 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 19_checkpoint_basic: 检查点创建、恢复与分支
 ```
 
-### 0.9 Agent Team
+### 0.9 Planning
+```
+学习目标:
+- 理解 Agent 规划的核心模式（Plan-and-Execute、ReWOO、Reflexion）
+- 掌握任务分解与计划表示
+- 学会执行循环与动态重规划
+- 理解 Planning 与 ReAct 的混合模式
+
+核心概念:
+- Plan: 执行计划（目标 + 步骤列表）
+- PlanStep: 计划步骤（描述、状态、结果）
+- Planner: 计划生成（LLM 驱动的任务分解）
+- PlanExecutor: 按步骤执行，收集观察结果
+- Replanner: 基于观察结果动态调整计划
+
+设计原则（提炼自 Claude Code Plan Mode 和 LangGraph）:
+- 先规划后执行: 复杂任务先生成完整计划
+- 动态调整: 执行中可根据观察结果重规划
+- 混合模式: 顶层 Plan-and-Execute，底层步骤可用 ReAct
+- 计划持久化: 结合 v0.8 Checkpoint 保存计划状态
+
+实验:
+- 21_plan_basic: Plan-and-Execute 基础模式
+- 22_plan_with_react: Plan + ReAct 混合模式
+- 23_plan_replanning: 动态重规划
+- 24_plan_checkpoint: 计划状态持久化（结合 Checkpoint）
+```
+
+### 0.10 Agent Team
 ```
 学习目标:
 - 理解多 Agent 协作模式
@@ -215,12 +246,12 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - Orchestrator: 任务编排
 
 实验:
-- 21_team_basic: 基础多 Agent
-- 22_task_decomposition: 任务分解
-- 23_collaboration: 协作模式
+- 25_team_basic: 基础多 Agent
+- 26_task_decomposition: 任务分解
+- 27_collaboration: 协作模式
 ```
 
-### 0.10 Integration
+### 0.11 Integration
 ```
 学习目标:
 - 理解完整 Agent 应用架构
@@ -234,9 +265,9 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - AgentApp: 完整应用
 
 实验:
-- 24_config: 配置管理
-- 25_error_handling: 错误处理
-- 26_complete_agent: 完整 Agent 应用
+- 28_config: 配置管理
+- 29_error_handling: 错误处理
+- 30_complete_agent: 完整 Agent 应用
 ```
 
 ---

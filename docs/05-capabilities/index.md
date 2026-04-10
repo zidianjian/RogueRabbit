@@ -14,7 +14,9 @@
 | **Permissions** | v0.6.x | ✅ 已完成 | 权限控制，安全边界 |
 | **Logging** | v0.7.x | ✅ 已完成 | 结构化日志，追踪 |
 | **Checkpoint** | v0.8.x | 📋 计划中 | 会话快照、链式检查点、状态恢复与分支 |
-| **Agent Team** | v0.9.x | 📋 计划中 | 多 Agent 协作 |
+| **Planning** | v0.9.x | 📋 计划中 | 任务分解、计划生成、执行与重规划 |
+| **Agent Team** | v0.10.x | 📋 计划中 | 多 Agent 协作 |
+| **Integration** | v0.11.x | 📋 计划中 | 配置管理、错误处理、完整应用 |
 
 ## 能力详情
 
@@ -129,6 +131,8 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
                               ↓
                       Checkpoint & Restore
                               ↓
+                         Planning
+                              ↓
                          Agent Team
                               ↓
                          Integration
@@ -155,6 +159,31 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 状态恢复与回滚（源于 Claude Code 本地快照思想）
 - 检查点谱系查询（get_lineage 追溯完整路径）
 - 文件持久化（JSONL 格式）
+
+---
+
+### Planning (v0.9.x)
+
+Agent 规划能力。
+
+**核心组件：**
+- `contracts/plan.py`: Plan 协议定义（Plan, PlanStep, Planner, PlanExecutor）
+- `core/plan_manager.py`: 规划管理器（创建/执行/重规划）
+- `core/plan_executor.py`: 计划执行器（按步骤执行，收集观察）
+
+**学习资源：**
+- `experiments/21_plan_basic.py`
+- `experiments/22_plan_with_react.py`
+- `experiments/23_plan_replanning.py`
+- `experiments/24_plan_checkpoint.py`
+
+**关键特性：**
+- 任务分解（LLM 驱动的目标拆分）
+- 计划表示（步骤列表 + 状态追踪）
+- 执行循环（按步骤执行 + 观察收集）
+- 动态重规划（基于观察结果调整计划）
+- Plan + ReAct 混合模式（顶层规划，底层反应式执行）
+- 计划持久化（结合 v0.8 Checkpoint）
 
 ## 扩展指南
 

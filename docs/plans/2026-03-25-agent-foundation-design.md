@@ -30,7 +30,7 @@
 1. 阶段一：0.x 学习型版本
    - 每个小版本只引入一个主题能力
    - 目标是形成最小闭环与清晰接口
-   - 主题包括 LLM、MCP、Skill、Session、权限、记忆、日志、Agent Team
+   - 主题包括 LLM、MCP、Skill、Session、权限、记忆、日志、Planning、Agent Team
 2. 阶段二：可用化
    - 将阶段一已有模块补齐为可持续使用的实现
    - 增加持久化、恢复、基础审计、可观察性与集成验证
@@ -47,8 +47,9 @@
 - 0.6：记忆系统
 - 0.7：日志系统
 - 0.8：Checkpoint & Restore
-- 0.9：Agent Team
-- 0.10：端到端整合
+- 0.9：Planning
+- 0.10：Agent Team
+- 0.11：端到端整合
 
 **仓库结构**
 
