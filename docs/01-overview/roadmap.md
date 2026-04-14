@@ -13,6 +13,12 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
                                                     ↓
                         Logging ← Permissions ←────┘
                               ↓
+                           Hooks
+                              ↓
+                         Commands
+                              ↓
+                         Gateways
+                              ↓
                       Checkpoint & Restore
                               ↓
                          Planning
@@ -95,14 +101,22 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 | **0.6** | **Permissions** | 工具权限、资源访问控制、安全边界 | ✅ 已完成 |
 | **0.7** | **Logging** | 结构化日志、追踪、性能监控 | ✅ 已完成 |
 
+### 扩展与交互层
+
+| 版本 | 功能 | 描述 | 状态 |
+|------|------|------|------|
+| **0.8** | **Hooks** | 生命周期钩子、事件拦截、行为扩展 | 📋 计划中 |
+| **0.9** | **Commands** | 命令路由、分发、用户交互模式 | 📋 计划中 |
+| **0.10** | **Gateways** | 协议适配、路由、多通道接入 | 📋 计划中 |
+
 ### 协作与集成层
 
 | 版本 | 功能 | 描述 | 状态 |
 |------|------|------|------|
-| **0.8** | **Checkpoint** | 会话快照、链式检查点、状态恢复与分支 | 📋 计划中 |
-| **0.9** | **Planning** | 任务分解、计划生成、执行与重规划 | 📋 计划中 |
-| **0.10** | **Agent Team** | 多 Agent 通信、任务分解、协作模式 | 📋 计划中 |
-| **0.11** | **Integration** | 配置管理、错误处理、完整应用 | 📋 计划中 |
+| **0.11** | **Checkpoint** | 会话快照、链式检查点、状态恢复与分支 | 📋 计划中 |
+| **0.12** | **Planning** | 任务分解、计划生成、执行与重规划 | 📋 计划中 |
+| **0.13** | **Agent Team** | 多 Agent 通信、任务分解、协作模式 | 📋 计划中 |
+| **0.14** | **Integration** | 配置管理、错误处理、完整应用 | 📋 计划中 |
 
 ---
 
@@ -181,7 +195,79 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 20_debugging: 调试支持
 ```
 
-### 0.8 Checkpoint & Restore
+### 0.8 Hooks
+```
+学习目标:
+- 理解 Agent 生命周期事件
+- 掌握钩子机制（前置/后置拦截）
+- 学会通过钩子扩展 Agent 行为
+
+核心概念:
+- Hook: 钩子函数（事件类型 + 回调）
+- HookManager: 钩子管理器（注册/触发/卸载）
+- HookEvent: 生命周期事件（LLM调用前后、工具调用前后、错误处理等）
+- HookContext: 钩子上下文（传递数据和状态）
+
+设计原则（提炼自 Claude Code Hooks 和 FastAPI Middleware）:
+- 洋葱模型: 请求穿过多层钩子，每层可拦截或修改
+- 正交扩展: 不修改核心逻辑即可添加行为
+- 顺序控制: 钩子按优先级执行，支持短路
+
+实验:
+- 21_hook_basic: 基础钩子注册与触发
+- 22_hook_lifecycle: Agent 生命周期钩子
+- 23_hook_chain: 钩子链与优先级
+```
+
+### 0.9 Commands
+```
+学习目标:
+- 理解用户与 Agent 的结构化交互模式
+- 掌握命令路由与分发
+- 学会命令解析和参数处理
+
+核心概念:
+- Command: 命令定义（名称、描述、参数、处理函数）
+- CommandRegistry: 命令注册表（注册/查找/列表）
+- CommandDispatcher: 命令分发器（解析/路由/执行）
+- CommandContext: 命令上下文（参数、会话、Agent 状态）
+
+设计原则（提炼自 Claude Code Slash Commands 和 CLI 框架）:
+- 统一入口: 所有用户交互通过命令系统
+- 可发现性: 命令自描述，支持帮助和补全
+- 可组合: 命令可嵌套和组合
+
+实验:
+- 24_command_basic: 基础命令定义与分发
+- 25_command_with_agent: 命令与 Agent 集成
+- 26_command_advanced: 参数解析、子命令、帮助系统
+```
+
+### 0.10 Gateways
+```
+学习目标:
+- 理解 Agent 的外部接口层
+- 掌握协议适配（HTTP、WebSocket、CLI）
+- 学会路由和中间件模式
+
+核心概念:
+- Gateway: 网关（协议 + 路由 + 中间件）
+- Route: 路由规则（路径 + 方法 + 处理函数）
+- Middleware: 中间件（请求/响应拦截）
+- GatewayBuilder: 网关构建器（配置式构建）
+
+设计原则（提炼自 API Gateway 和 MCP Server）:
+- 协议无关: 核心逻辑不依赖具体协议
+- 中间件栈: 请求穿过多层中间件处理
+- 统一错误: 不同协议的错误统一处理
+
+实验:
+- 27_gateway_http: HTTP 网关（REST API）
+- 28_gateway_websocket: WebSocket 网关（实时交互）
+- 29_gateway_cli: CLI 网关（命令行交互）
+```
+
+### 0.11 Checkpoint & Restore
 ```
 学习目标:
 - 理解 OpenAI 的链式引用（previous_response_id）和 Claude Code 的本地快照原理
@@ -201,10 +287,10 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 自动触发: 关键操作时自动创建检查点
 
 实验:
-- 19_checkpoint_basic: 检查点创建、恢复与分支
+- 30_checkpoint_basic: 检查点创建、恢复与分支
 ```
 
-### 0.9 Planning
+### 0.12 Planning
 ```
 学习目标:
 - 理解 Agent 规划的核心模式（Plan-and-Execute、ReWOO、Reflexion）
@@ -223,16 +309,16 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - 先规划后执行: 复杂任务先生成完整计划
 - 动态调整: 执行中可根据观察结果重规划
 - 混合模式: 顶层 Plan-and-Execute，底层步骤可用 ReAct
-- 计划持久化: 结合 v0.8 Checkpoint 保存计划状态
+- 计划持久化: 结合 v0.11 Checkpoint 保存计划状态
 
 实验:
-- 21_plan_basic: Plan-and-Execute 基础模式
-- 22_plan_with_react: Plan + ReAct 混合模式
-- 23_plan_replanning: 动态重规划
-- 24_plan_checkpoint: 计划状态持久化（结合 Checkpoint）
+- 31_plan_basic: Plan-and-Execute 基础模式
+- 32_plan_with_react: Plan + ReAct 混合模式
+- 33_plan_replanning: 动态重规划
+- 34_plan_checkpoint: 计划状态持久化（结合 Checkpoint）
 ```
 
-### 0.10 Agent Team
+### 0.13 Agent Team
 ```
 学习目标:
 - 理解多 Agent 协作模式
@@ -246,12 +332,12 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - Orchestrator: 任务编排
 
 实验:
-- 25_team_basic: 基础多 Agent
-- 26_task_decomposition: 任务分解
-- 27_collaboration: 协作模式
+- 35_team_basic: 基础多 Agent
+- 36_task_decomposition: 任务分解
+- 37_collaboration: 协作模式
 ```
 
-### 0.11 Integration
+### 0.14 Integration
 ```
 学习目标:
 - 理解完整 Agent 应用架构
@@ -265,9 +351,9 @@ LLM 交互 → MCP 工具 → Skill 知识 → Session 状态 → Memory 记忆
 - AgentApp: 完整应用
 
 实验:
-- 28_config: 配置管理
-- 29_error_handling: 错误处理
-- 30_complete_agent: 完整 Agent 应用
+- 38_config: 配置管理
+- 39_error_handling: 错误处理
+- 40_complete_agent: 完整 Agent 应用
 ```
 
 ---

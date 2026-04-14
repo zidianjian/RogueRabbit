@@ -1,8 +1,8 @@
-# Checkpoint & Restore 设计方案 (v0.8.0)
+# Checkpoint & Restore 设计方案 (v0.11.0)
 
 **日期**: 2026-04-09
 **状态**: 计划中
-**前置版本**: v0.7.0 (Logging)
+**前置版本**: v0.10.0 (Gateways)
 
 ---
 
