@@ -62,6 +62,7 @@ from rogue_rabbit.contracts.log import (
     MetricPoint,
     MetricStore,
 )
+from rogue_rabbit.contracts.hook import HookEvent, HookContext, HookCallback
 
 __all__ = [
     # 消息相关
@@ -115,4 +116,8 @@ __all__ = [
     "MetricType",
     "MetricPoint",
     "MetricStore",
+    # Hook 相关 (v0.8 新增)
+    "HookEvent",
+    "HookContext",
+    "HookCallback",
 ]

@@ -11,6 +11,7 @@ from rogue_rabbit.core.context_window import (
 )
 from rogue_rabbit.core.log_manager import MetricsCollector, StructuredLogger, Tracer
 from rogue_rabbit.core.memory_manager import MemoryManager
+from rogue_rabbit.core.hook_manager import HookManager
 from rogue_rabbit.core.authorizer import Authorizer
 from rogue_rabbit.core.react_agent import ReActAgent
 from rogue_rabbit.core.session_manager import SessionManager
@@ -32,4 +33,6 @@ __all__ = [
     "StructuredLogger",
     "Tracer",
     "MetricsCollector",
+    # Hook 相关 (v0.8 新增)
+    "HookManager",
 ]
